@@ -11,43 +11,42 @@ import SwiftUI
 struct DiaryEntryEdit: View {
     
     @Environment(\.managedObjectContext) var managedObjectContext
-    @Environment(\.presentationMode) private var presentationMode
     
-    @State var diaryEntry = ""
+    @State private var entryHolder = ""
     
-    @FetchRequest(entity: Entry.entity(),
-                  sortDescriptors: [])
+    @Binding var isPresented: Bool
     
-    private var entries: FetchedResults<Entry>
+    var diaryEntry: Entry
     
     var body: some View {
         NavigationView {
             Form {
                 Section(header: Text("Edit your entry")) {
-                    TextField("Edit Here", text: $diaryEntry)
+                    TextField("Edit Here", text: $entryHolder)
                         .keyboardType(.default)
                 }
                 Button(action: {
-                    guard self.diaryEntry != "" else { return }
-                    let newEntry = Entry(context: self.managedObjectContext)
-                    newEntry.diaryEntry = self.diaryEntry
-                    
-                    do {
-                        try self.managedObjectContext.save()
-                        self.presentationMode.wrappedValue.dismiss()
-                    } catch {
-                        print(error.localizedDescription)
-                    }
+                    self.diaryEntry.diaryEntry = self.entryHolder
+                    try! self.managedObjectContext.save()
+                    self.isPresented = false
                 }) {
                     Text("Update Entry")
                 }
             }.navigationBarTitle("Edit Entry")
         }
+        .onAppear {
+            self.entryHolder = self.diaryEntry.diaryEntry
+        }
     }
 }
 
 struct DiaryEntryEdit_Previews: PreviewProvider {
+    @Environment(\.managedObjectContext) static var managedObjectContext
+    
     static var previews: some View {
-        DiaryEntryEdit()
+        let entry = Entry(context: managedObjectContext)
+        entry.diaryEntry = "Hello"
+        
+        return DiaryEntryEdit(isPresented: .constant(true), diaryEntry: entry)
     }
 }

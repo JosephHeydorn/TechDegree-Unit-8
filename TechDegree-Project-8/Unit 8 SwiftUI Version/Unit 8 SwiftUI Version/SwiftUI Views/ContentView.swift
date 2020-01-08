@@ -13,19 +13,17 @@ struct ContentView: View {
     
     @Environment(\.managedObjectContext) var managedObjectContext
     
-    @FetchRequest(entity: Entry.entity(),
-                  sortDescriptors: [])
-    
-    private var entries: FetchedResults<Entry>
+    @FetchRequest(entity: Entry.entity(), sortDescriptors: [NSSortDescriptor(keyPath: \Entry.diaryEntry, ascending: false)]) var entries: FetchedResults<Entry>
 
     @State var showDiaryEntry = false
     @State var showDiaryEntryEdit = false
     @State var coreLocation = LocationHandler()
     
     var body: some View {
-        NavigationView {
-            List(entries) { entry in
-                NavigationLink(destination: DiaryEntryEdit()) {
+    NavigationView {
+        List {
+            ForEach(entries, id: \.diaryEntry) { entry in
+                NavigationLink(destination: DiaryEntryEdit(isPresented: self.$showDiaryEntryEdit, diaryEntry: entry)) {
                     HStack {
                         VStack(alignment: .leading) {
                             Text("\(entry.diaryEntry)")
@@ -37,12 +35,17 @@ struct ContentView: View {
                         }
                     }
                 }
-//                .onDelete { indexSet in
-//                    for index in indexSet {
-//                        self.managedObjectContext.delete(self.entries[index])
-//                    }
-//                }
+                .onTapGesture {
+                    self.showDiaryEntryEdit.toggle()
+                }
             }
+            .onDelete { indexSet in
+                for index in indexSet {
+                    self.managedObjectContext.delete(self.entries[index])
+                    try! self.managedObjectContext.save()
+                }
+            }
+        }
             .sheet(isPresented: $showDiaryEntry) {
                 DiaryEntry().environment(\.managedObjectContext, self.managedObjectContext)
             }
