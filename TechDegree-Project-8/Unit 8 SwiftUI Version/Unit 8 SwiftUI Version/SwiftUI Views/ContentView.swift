@@ -16,17 +16,16 @@ struct ContentView: View {
     @FetchRequest(entity: Entry.entity(),
                   sortDescriptors: [])
     
-    var entries: FetchedResults<Entry>
+    private var entries: FetchedResults<Entry>
 
-    
     @State var showDiaryEntry = false
+    @State var showDiaryEntryEdit = false
     @State var coreLocation = LocationHandler()
-    
     
     var body: some View {
         NavigationView {
-            List {
-                ForEach(entries) { entry in
+            List(entries) { entry in
+                NavigationLink(destination: DiaryEntryEdit()) {
                     HStack {
                         VStack(alignment: .leading) {
                             Text("\(entry.diaryEntry)")
@@ -35,16 +34,14 @@ struct ContentView: View {
                                 .font(.subheadline)
                             Text("Location: \(entry.location)")
                                 .font(.subheadline)
-                                .foregroundColor(Color.init(red: 173, green: 216, blue: 230))
                         }
                     }
                 }
-
-                .onDelete { indexSet in
-                    for index in indexSet {
-                        self.managedObjectContext.delete(self.entries[index])
-                    }
-                }
+//                .onDelete { indexSet in
+//                    for index in indexSet {
+//                        self.managedObjectContext.delete(self.entries[index])
+//                    }
+//                }
             }
             .sheet(isPresented: $showDiaryEntry) {
                 DiaryEntry().environment(\.managedObjectContext, self.managedObjectContext)

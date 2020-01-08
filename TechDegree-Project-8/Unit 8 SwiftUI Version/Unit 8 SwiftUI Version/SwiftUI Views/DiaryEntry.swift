@@ -11,17 +11,17 @@ import SwiftUI
 struct DiaryEntry: View {
     
     @Environment(\.managedObjectContext) var managedObjectContext
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.presentationMode) private var presentationMode
     
     let moodTypes = ["Happy", "Average", "Bad"]
-    @State var selectedMoodIndex = 1
-    @State var diaryEntry = ""
-    @State var date = Date()
-    @State var formatter = DateFormatter()
+    @State private var selectedMoodIndex = 1
+    @State private var diaryEntry = ""
+    @State private var date = Date()
+    @State private var formatter = DateFormatter()
     
     //Location Manager
-    @State var coreLocation = LocationHandler()
-    @State var locationButtonPressed = false
+    @State private var coreLocation = LocationHandler()
+    @State private var locationButtonPressed = false
     
     
     var body: some View {

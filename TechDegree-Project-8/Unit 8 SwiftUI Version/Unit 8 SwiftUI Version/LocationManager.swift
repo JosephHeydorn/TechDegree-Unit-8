@@ -8,7 +8,7 @@
 
 import CoreLocation
 
-var locationHolder = ""
+    var locationHolder = ""
 
 class LocationHandler: CLLocationManager {
     private let locationManager = CLLocationManager()
